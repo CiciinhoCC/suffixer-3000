@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suffixer 3000</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="inputoutput">
+        <div>
+            <h1>Input</h1>
+            <textarea name="input" id="input" placeholder="Words go here"></textarea>
+        </div>
+        <div>
+            <h1>Output</h1>
+            <textarea name="output" id="output" placeholder="Tables appear here" readonly></textarea>
+        </div>
+    </div>
+    <div class="colnumbers">
+        <input type="number" name="firstCol" id="firstCol" placeholder="Column 1">
+        <input type="number" name="secondCol" id="secondCol" placeholder="Column 2">
+        <button type="button" onclick="doTheThing()">Do the thing</button>
+
+        <div class="text">
+            <h2>How to use it</h2>
+            <p>
+                - Copy-paste your words from google sheets or excel onto the "Input" area <br>
+                - Select the two columns of words whose suffixes you want to compare (keep in mind 0 means the first column) <br>
+                - Press "Do the thing" and it'll spit out a table on the "Output" area which shows the how likely a column 1 suffix is to become a column 2 suffix <br>
+                - Copy-paste it back to your document. It's already formatted to just spit out a table in your spreadsheet
+            </p>
+            <h2>Limitations</h2>
+            <p>
+                The program tends to ignore the beginning bits of suffixes. Do NOT take the output as gospel, only use it to help you if you're making a case table or something. Always check the actual words before doing anything.
+            </p>
+        </div>
+    </div>
+
+
+    <script src="main.js"></script>
+    <script>
+        function doTheThing() {
+            let input = document.getElementById("input").value;
+            let words = [];
+            input.split("\n").forEach(word => {
+                words.push(word.replaceAll("́", "").split("	"));
+            });
+            let firstCol = words.map((x) => {
+                return x[document.getElementById("firstCol").value]
+            });
+            let secondCol = words.map((x) => {
+                return x[document.getElementById("secondCol").value]
+            });
+            console.log(words)
+
+            const output = top3(pairingFrequency(
+                suffixFrequency(firstCol, []),
+                suffixFrequency(secondCol, [])
+            ));
+
+            document.getElementById("output").value = output;
+        }
+
+    </script>
+</body>
+
+</html>
