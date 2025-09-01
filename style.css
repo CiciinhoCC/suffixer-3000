@@ -34,5 +34,7 @@ body {
         flex-direction: column;
         text-indent: 10px;
         text-align: justify;
+
+        overflow-y: scroll;
     }
 }

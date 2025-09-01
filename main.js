@@ -311,21 +311,3 @@ function pairingFrequency(case1, case2) {
 
     return [matchTable, suffixes1, suffixes2, frequencies1, frequencies2];
 }
-
-// module.exports = {
-//     findAllSuffixes: function (list, known = [], tooSmall = 0) {
-//         findAllSuffixes(list, known, tooSmall);
-//     },
-//     suffixFrequency: function (list, known, readable = false) {
-//         suffixFrequency(list, known, readable);
-//     },
-//     matchTable: function (results) {
-//         matchTable(results);
-//     },
-//     top3: function (results) {
-//         top3(results);
-//     },
-//     pairingFrequency: function (case1, case2) {
-//         pairingFrequency(case1, case2);
-//     }
-// };

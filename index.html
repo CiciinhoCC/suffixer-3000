@@ -22,19 +22,46 @@
     <div class="colnumbers">
         <input type="number" name="firstCol" id="firstCol" placeholder="Column 1">
         <input type="number" name="secondCol" id="secondCol" placeholder="Column 2">
+        <div class="known">
+            <textarea name="known1" id="known1" placeholder="List all known suffixes for column 1"></textarea>
+            <textarea name="known2" id="known2" placeholder="List all known suffixes for column 2"></textarea>
+        </div>
+        <div class="radio">
+            <div>
+                <input type="radio" id="top3" name="output" value="top3" checked />
+                <label for="top3">Likeliest</label>
+            </div>
+            <div>
+                <input type="radio" id="matchTable" name="output" value="matchTable" />
+                <label for="matchTable">Matching Table</label>
+            </div>
+            <div>
+                <input type="radio" id="listSuffixes" name="output" value="listSuffixes" />
+                <label for="top3">List Suffixes</label>
+            </div>
+            <div>
+                <input type="radio" id="frequency" name="output" value="frequency" />
+                <label for="frequency">Suffix Frequency</label>
+            </div>
+        </div>
         <button type="button" onclick="doTheThing()">Do the thing</button>
 
         <div class="text">
             <h2>How to use it</h2>
             <p>
                 - Copy-paste your words from google sheets or excel onto the "Input" area <br>
-                - Select the two columns of words whose suffixes you want to compare (keep in mind 0 means the first column) <br>
-                - Press "Do the thing" and it'll spit out a table on the "Output" area which shows the how likely a column 1 suffix is to become a column 2 suffix <br>
-                - Copy-paste it back to your document. It's already formatted to just spit out a table in your spreadsheet
+                - Select the two columns of words whose suffixes you want to compare (keep in mind 0 means the first
+                column) <br>
+                - Press "Do the thing" and it'll spit out a table on the "Output" area which shows the how likely a
+                column 1 suffix is to become a column 2 suffix <br>
+                - Copy-paste it back to your document. It's already formatted to just spit out a table in your
+                spreadsheet
             </p>
             <h2>Limitations</h2>
             <p>
-                The program tends to ignore the beginning bits of suffixes. Do NOT take the output as gospel, only use it to help you if you're making a case table or something. Always check the actual words before doing anything.
+                The program tends to ignore the beginning bits of suffixes. Do NOT take the output as gospel, only use
+                it to help you if you're making a case table or something. Always check the actual words before doing
+                anything.
             </p>
         </div>
     </div>
@@ -54,12 +81,32 @@
             let secondCol = words.map((x) => {
                 return x[document.getElementById("secondCol").value]
             });
-            console.log(words)
 
-            const output = top3(pairingFrequency(
-                suffixFrequency(firstCol, []),
-                suffixFrequency(secondCol, [])
-            ));
+            const known1 = document.getElementById("known1").value.split(" ").filter(n=>n);
+            const known2 = document.getElementById("known2").value.split(" ").filter(n=>n);
+
+            const selectedRadio = document.querySelector('input[name="output"]:checked').value;
+
+            let output = "";
+
+            if(selectedRadio == "top3"){
+                output = top3(pairingFrequency(
+                    suffixFrequency(firstCol, known1),
+                    suffixFrequency(secondCol, known2)
+                ));
+            }
+            if(selectedRadio == "matchTable"){
+                output = matchTable(pairingFrequency(
+                    suffixFrequency(firstCol, known1),
+                    suffixFrequency(secondCol, known2)
+                ));
+            }
+            if(selectedRadio == "listSuffixes"){
+                output = findAllSuffixes(firstCol, known1).join("\n");
+            }
+            if(selectedRadio == "suffixFrequency"){
+                output = suffixFrequency(firstCol, known1,true)
+            }
 
             document.getElementById("output").value = output;
         }
