@@ -29,20 +29,21 @@
         <div class="radio">
             <div>
                 <input type="radio" id="top3" name="output" value="top3" checked />
-                <label for="top3">Likeliest</label>
+                <label for="top3" title="Shows the top most likely col2 suffixes for a col1 one">Likeliest</label>
             </div>
             <div>
                 <input type="radio" id="matchTable" name="output" value="matchTable" />
-                <label for="matchTable">Matching Table</label>
+                <label for="matchTable" title="Shows how many times two suffixes are matched">Matching Table</label>
             </div>
             <div>
-                <input type="radio" id="listSuffixes" name="output" value="listSuffixes" />
-                <label for="top3">List Suffixes</label>
+                <input type="radio" id="list" name="output" value="list" />
+                <label for="list" title="Lists all the col1 suffixes">List Suffixes</label>
             </div>
             <div>
                 <input type="radio" id="frequency" name="output" value="frequency" />
-                <label for="frequency">Suffix Frequency</label>
+                <label for="frequency" title="Shows how many times each col1 suffix shows up">Suffix Frequency</label>
             </div>
+            <input type="number" name="tooSmall" id="tooSmall" placeholder="Min. Suffix length">
         </div>
         <button type="button" onclick="doTheThing()">Do the thing</button>
 
@@ -55,7 +56,8 @@
                 - Press "Do the thing" and it'll spit out a table on the "Output" area which shows the how likely a
                 column 1 suffix is to become a column 2 suffix <br>
                 - Copy-paste it back to your document. It's already formatted to just spit out a table in your
-                spreadsheet
+                spreadsheet <br>
+                - It's set to "Likeliest" by default, there are other output options tho, hover on them and it'll give a little description
             </p>
             <h2>Limitations</h2>
             <p>
@@ -63,6 +65,8 @@
                 it to help you if you're making a case table or something. Always check the actual words before doing
                 anything.
             </p>
+            <p>It also tends to not notice some pretty obvious suffixes. If you find one of those, put it in the "known
+                suffixes" list.</p>
         </div>
     </div>
 
@@ -82,30 +86,31 @@
                 return x[document.getElementById("secondCol").value]
             });
 
-            const known1 = document.getElementById("known1").value.split(" ").filter(n=>n);
-            const known2 = document.getElementById("known2").value.split(" ").filter(n=>n);
+            const known1 = document.getElementById("known1").value.split(" ").filter(n => n);
+            const known2 = document.getElementById("known2").value.split(" ").filter(n => n);
+            const tooSmall = document.getElementById("tooSmall").value - 1;
 
             const selectedRadio = document.querySelector('input[name="output"]:checked').value;
 
             let output = "";
 
-            if(selectedRadio == "top3"){
+            if (selectedRadio == "top3") {
                 output = top3(pairingFrequency(
-                    suffixFrequency(firstCol, known1),
-                    suffixFrequency(secondCol, known2)
+                    suffixFrequency(firstCol, known1, tooSmall, false),
+                    suffixFrequency(secondCol, known2, tooSmall, false)
                 ));
             }
-            if(selectedRadio == "matchTable"){
+            if (selectedRadio == "matchTable") {
                 output = matchTable(pairingFrequency(
-                    suffixFrequency(firstCol, known1),
-                    suffixFrequency(secondCol, known2)
+                    suffixFrequency(firstCol, known1, tooSmall),
+                    suffixFrequency(secondCol, known2, tooSmall)
                 ));
             }
-            if(selectedRadio == "listSuffixes"){
-                output = findAllSuffixes(firstCol, known1).join("\n");
+            if (selectedRadio == "list") {
+                output = findAllSuffixes(firstCol, known1, tooSmall).join("\n");
             }
-            if(selectedRadio == "suffixFrequency"){
-                output = suffixFrequency(firstCol, known1,true)
+            if (selectedRadio == "frequency") {
+                output = suffixFrequency(firstCol, known1, tooSmall, true)
             }
 
             document.getElementById("output").value = output;

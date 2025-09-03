@@ -36,11 +36,6 @@ function purge(arr, purge) {
     }
     return purgedArr;
 }
-// function updateLine(txt) {
-//     process.stdout.clearLine(0);
-//     process.stdout.cursorTo(0);
-//     process.stdout.write(txt);
-// }
 String.prototype.isIn = (str) => {
     return findSuffix(this, str) == this;
 }
@@ -63,7 +58,6 @@ const loadingThing = ["|", "/", "-", "\\"];
 
 function findAllSuffixes(list, known = [], tooSmall = 0) {
     let suffixes = known;
-    console.time("Time (findAllSuffixes)");
     let diacritics = ['͡', '́', 'ː'];
 
     for (let i = 0; i < list.length; i++) {
@@ -72,8 +66,6 @@ function findAllSuffixes(list, known = [], tooSmall = 0) {
         let suffixGroupNEO = [];
         let foundIt = false;
         const oldSuffixes = suffixes;
-
-        // updateLine(`${i}/${list.length}: ${pivotWord}`);
 
         try {
             for (let j = 0; j < oldSuffixes.length && !foundIt; j++) {
@@ -99,23 +91,9 @@ function findAllSuffixes(list, known = [], tooSmall = 0) {
                 if (diacritics.includes(suffixNEO[0])) { suffixNEO = findSuffix(pivotWord, checkWord, 2); }
 
                 if (suffix !== "") {
-                    // if (!suffixGroup.includes(suffix)) {
-                    //     suffixGroup.push(suffix);
-                    // }
-                    // if (!suffixGroupNEO.includes(suffixNEO)) {
-                    //     suffixGroupNEO.push(suffixNEO);
-                    // }
                     suffixGroup.push(suffix);
                     suffixGroupNEO.push(suffixNEO);
                 }
-                // if (suffixGroup.length >= 10) {
-                //     suffixes.push(longest(suffixGroup));
-                //     foundIt = true;
-                // }
-                // if (suffixGroupNEO.length >= 10) {
-                //     suffixes.push(longest(suffixGroupNEO));
-                //     foundIt = true;
-                // }
             }
             if (!foundIt) {
                 if (suffixGroup.length > 1) {
@@ -124,14 +102,16 @@ function findAllSuffixes(list, known = [], tooSmall = 0) {
                 if (suffixGroupNEO.length > 1) {
                     suffixes.push(longest(suffixGroupNEO));
                 }
-                else { suffixes.push("*" + pivotWord); }
+                else {
+                    suffixes.push(pivotWord);
+                }
             }
             suffixes = [...new Set(sortByLength(suffixes))];
         }
         catch (error) {
             console.log(`----------------\nERROR \nWORD: ${pivotWord}\n----------------`);
             console.log(error);
-            suffixes.push("*" + pivotWord);
+            suffixes.push(pivotWord);
         }
     }
 
@@ -142,15 +122,10 @@ function findAllSuffixes(list, known = [], tooSmall = 0) {
         for (let j = 0; j < suffixes.length; j++) {
             const suffix = suffixes[j];
             if (findSuffix(word, suffix) == suffix) {
-                matches.push([suffix, j]);
+                frequencies[j]++
             }
         }
-        matches.sort((a, b) => b[0].length - a[0].length);
-        if (matches[0] !== undefined) {
-            frequencies[matches[0][1]]++;
-        }
     }
-    console.log(frequencies);
     let purifiedSuffixes = []
     for (let i = 0; i < suffixes.length; i++) {
         const suffix = suffixes[i];
@@ -160,14 +135,11 @@ function findAllSuffixes(list, known = [], tooSmall = 0) {
     }
 
     suffixes = purifiedSuffixes;
-    // updateLine("Done :D \n")
-    console.timeEnd("Time (findAllSuffixes)");
     return [...new Set(sortByLength(purge(suffixes, "*")))];
 }
 
-function suffixFrequency(list, known, readable = false) {
-    console.time("Time (suffixFrequency)");
-    let suffixes = findAllSuffixes(list, known, 1);
+function suffixFrequency(list, known, tooSmall = 0, readable = false) {
+    let suffixes = findAllSuffixes(list, known, tooSmall);
     let matches = [];
     let frequencies = [];
     let noMatch = [];
@@ -175,7 +147,6 @@ function suffixFrequency(list, known, readable = false) {
     for (let i = 0; i < list.length; i++) {
         const word = list[i];
         let matchAll = [];
-        // updateLine(`${i}/${list.length}: ${word}`);
         for (let j = 0; j < suffixes.length; j++) {
             const suffix = suffixes[j];
             const mat = findSuffix(word, suffix);
@@ -215,12 +186,9 @@ function suffixFrequency(list, known, readable = false) {
         const suffix = spfSorted[i][0];
         const frequency = spfSorted[i][1];
 
-        if (frequency > 1) { percentages += `${suffix}: ${frequency}\n`; }
+        if (frequency > 0) { percentages += `${suffix}: ${frequency}\n`; }
     }
     if (noMatch.length > 0) { percentages += `No matches: ${JSON.stringify(noMatch)}\n`; }
-
-    // updateLine("Done :D\n");
-    console.timeEnd("Time (suffixFrequency)");
     if (readable) { return percentages; }
     return [matches, suffixes, frequencies];
 }
@@ -263,7 +231,6 @@ function top3(results) {
         top3list.push(top3row);
     }
     top3list.sort((a, b) => b[1] - a[1]);
-    console.log(top3list);
     return sheetify(top3list);
 }
 
